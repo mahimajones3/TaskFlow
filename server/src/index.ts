@@ -69,12 +69,17 @@ initDB();
 app.get('/api/debug-db', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
+    const tables = await pool.query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
+    const userCount = await pool.query("SELECT COUNT(*) FROM users").catch(() => ({ rows: [{ count: 'Error: table might not exist' }] }));
+
     res.json({
       status: 'Database connected',
       time: result.rows[0].now,
       isProduction,
       hasDatabaseUrl: !!process.env.DATABASE_URL,
       hasIndividualVars: !!(process.env.DB_HOST && process.env.DB_USER),
+      tables: tables.rows.map(r => r.table_name),
+      userCount: userCount.rows[0].count,
       config: {
         host: poolConfig.host,
         database: poolConfig.database,
