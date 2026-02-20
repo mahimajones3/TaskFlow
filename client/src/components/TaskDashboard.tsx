@@ -19,7 +19,7 @@ const TaskDashboard: React.FC = () => {
 
     const fetchTasks = async () => {
         try {
-            const res = await fetch('http://localhost:3001/api/tasks');
+            const res = await fetch('/api/tasks');
             const data = await res.json();
             setTasks(data);
         } catch (err) {
@@ -46,7 +46,7 @@ const TaskDashboard: React.FC = () => {
         e.preventDefault();
         if (!newTitle) return;
         try {
-            const res = await fetch('http://localhost:3001/api/tasks', {
+            const res = await fetch('/api/tasks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title: newTitle, description: newDesc }),
@@ -64,7 +64,7 @@ const TaskDashboard: React.FC = () => {
     const toggleTask = async (task: Task) => {
         const nextStatus = task.status === 'done' ? 'todo' : 'done';
         try {
-            await fetch(`http://localhost:3001/api/tasks/${task.id}`, {
+            await fetch(`/api/tasks/${task.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: nextStatus }),
@@ -77,7 +77,7 @@ const TaskDashboard: React.FC = () => {
 
     const deleteTask = async (id: number) => {
         try {
-            await fetch(`http://localhost:3001/api/tasks/${id}`, { method: 'DELETE' });
+            await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
             fetchTasks();
         } catch (err) {
             console.error('Delete error:', err);
@@ -95,7 +95,7 @@ const TaskDashboard: React.FC = () => {
                         <p className="text-slate-400">Authenticated as: <span className="text-neon-teal font-mono">{userEmail || 'ROOT_USER'}</span></p>
                     </div>
                     <div className="flex items-center gap-4">
-                    
+
                         <button
                             onClick={handleLogout}
                             className="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors"
