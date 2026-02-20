@@ -15,6 +15,7 @@ const port = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
+app.use(express.json());
 // DB Connection
 const dbUrl = process.env.DATABASE_URL;
 console.log('Environment:', process.env.NODE_ENV);
