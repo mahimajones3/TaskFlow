@@ -15,12 +15,18 @@ const port = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
-
 // DB Connection
-const dbUrl = process.env.DATABASE_URL;
+let dbUrl = process.env.DATABASE_URL;
 console.log('Environment:', process.env.NODE_ENV);
-if (!dbUrl) {
+
+if (dbUrl) {
+  // Sanitize Railway-specific or malformed protocols
+  if (dbUrl.startsWith('railwaypostgresql://')) {
+    dbUrl = dbUrl.replace('railwaypostgresql://', 'postgresql://');
+  } else if (dbUrl.startsWith('railwaypostgres://')) {
+    dbUrl = dbUrl.replace('railwaypostgres://', 'postgresql://');
+  }
+} else {
   console.warn('WARNING: DATABASE_URL is not set. Database operations will fail.');
 }
 
