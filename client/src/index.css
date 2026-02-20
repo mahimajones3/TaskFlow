@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  --color-neon-teal: #32F9B1;
+  --color-dark-900: #000000;
+  --color-dark-800: #0B0C0E;
+  --color-dark-700: #1A1C1E;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-display: "Outfit", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply antialiased text-slate-300 bg-black;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
+
+@utility glass {
+  @apply bg-black/60 backdrop-blur-xl border border-white/10;
+}
+
+@utility neon-btn {
+  @apply bg-neon-teal text-black font-bold px-8 py-4 rounded-full transition-all hover:scale-105 active:scale-95;
+  box-shadow: 0 0 20px rgba(50, 249, 177, 0.3);
+
+  &:hover {
+    box-shadow: 0 0 30px rgba(50, 249, 177, 0.5);
+  }
+}
+
+@utility glow-text {
+  text-shadow: 0 0 10px rgba(50, 249, 177, 0.5);
+}
