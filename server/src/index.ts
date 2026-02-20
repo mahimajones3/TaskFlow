@@ -18,13 +18,18 @@ app.use(cors());
 app.use(express.json());
 
 // DB Connection
+const dbUrl = process.env.DATABASE_URL;
 console.log('Environment:', process.env.NODE_ENV);
-const isProduction = process.env.NODE_ENV === 'production' || (process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('localhost'));
+if (!dbUrl) {
+  console.warn('WARNING: DATABASE_URL is not set. Database operations will fail.');
+}
+
+const isProduction = process.env.NODE_ENV === 'production' || (dbUrl && !dbUrl.includes('localhost'));
 console.log('Detected environment for SSL:', isProduction ? 'Production' : 'Local');
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: isProduction ? { rejectUnauthorized: false } : undefined,
+  connectionString: dbUrl,
+  ssl: isProduction && dbUrl ? { rejectUnauthorized: false } : undefined,
 });
 
 // Initialize DB Tables
@@ -56,7 +61,8 @@ app.get('/api/debug-db', async (req, res) => {
       status: 'Database connected',
       time: result.rows[0].now,
       isProduction,
-      hasDatabaseUrl: !!process.env.DATABASE_URL
+      hasDatabaseUrl: !!process.env.DATABASE_URL,
+      dbUrlStart: process.env.DATABASE_URL ? `${process.env.DATABASE_URL.substring(0, 15)}...` : 'None'
     });
   } catch (err: any) {
     console.error('Debug DB Error:', err);
