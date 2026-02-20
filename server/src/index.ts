@@ -70,7 +70,9 @@ app.get('/api/debug-db', async (req, res) => {
       error: 'Database connection failed',
       details: err.message,
       code: err.code,
-      isProduction
+      isProduction,
+      hasDatabaseUrl: !!process.env.DATABASE_URL,
+      dbUrlStart: process.env.DATABASE_URL ? `${process.env.DATABASE_URL.substring(0, 15)}...` : 'None'
     });
   }
 });
