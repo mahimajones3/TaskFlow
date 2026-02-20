@@ -20,6 +20,7 @@ app.use(express.json());
 // DB Connection
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
 // Initialize DB Tables
@@ -52,9 +53,9 @@ app.post('/api/login', async (req, res) => {
     } else {
       res.status(401).json({ error: 'Invalid credentials' });
     }
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Auth failed' });
+  } catch (err: any) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Auth failed', details: err.message });
   }
 });
 // Waitlist Route
@@ -92,9 +93,9 @@ app.post('/api/tasks', async (req, res) => {
       [title, description]
     );
     res.status(201).json(result.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to create task' });
+  } catch (err: any) {
+    console.error('Task creation error:', err);
+    res.status(500).json({ error: 'Failed to create task', details: err.message });
   }
 });
 
