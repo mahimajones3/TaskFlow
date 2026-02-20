@@ -20,12 +20,12 @@ let dbUrl = process.env.DATABASE_URL;
 console.log('Environment:', process.env.NODE_ENV);
 
 if (dbUrl) {
-  // Sanitize Railway-specific or malformed protocols
-  if (dbUrl.startsWith('railwaypostgresql://')) {
-    dbUrl = dbUrl.replace('railwaypostgresql://', 'postgresql://');
-  } else if (dbUrl.startsWith('railwaypostgres://')) {
-    dbUrl = dbUrl.replace('railwaypostgres://', 'postgresql://');
-  }
+  // Extremely robust sanitization
+  dbUrl = dbUrl.trim();
+  dbUrl = dbUrl.replace(/railwaypostgresql:\/\//gi, 'postgresql://');
+  dbUrl = dbUrl.replace(/railwaypostgres:\/\//gi, 'postgresql://');
+  // Handle cases where the whole string might be wrapped in quotes
+  dbUrl = dbUrl.replace(/^["']|["']$/g, '');
 } else {
   console.warn('WARNING: DATABASE_URL is not set. Database operations will fail.');
 }
@@ -68,7 +68,8 @@ app.get('/api/debug-db', async (req, res) => {
       time: result.rows[0].now,
       isProduction,
       hasDatabaseUrl: !!process.env.DATABASE_URL,
-      dbUrlStart: process.env.DATABASE_URL ? `${process.env.DATABASE_URL.substring(0, 15)}...` : 'None'
+      dbUrlOriginal: process.env.DATABASE_URL ? `${process.env.DATABASE_URL.substring(0, 30)}...` : 'None',
+      dbUrlSanitized: dbUrl ? `${dbUrl.substring(0, 30)}...` : 'None'
     });
   } catch (err: any) {
     console.error('Debug DB Error:', err);
@@ -78,7 +79,8 @@ app.get('/api/debug-db', async (req, res) => {
       code: err.code,
       isProduction,
       hasDatabaseUrl: !!process.env.DATABASE_URL,
-      dbUrlStart: process.env.DATABASE_URL ? `${process.env.DATABASE_URL.substring(0, 15)}...` : 'None'
+      dbUrlOriginal: process.env.DATABASE_URL ? `${process.env.DATABASE_URL.substring(0, 30)}...` : 'None',
+      dbUrlSanitized: dbUrl ? `${dbUrl.substring(0, 30)}...` : 'None'
     });
   }
 });
