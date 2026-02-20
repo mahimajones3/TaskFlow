@@ -18,9 +18,13 @@ app.use(cors());
 app.use(express.json());
 
 // DB Connection
+console.log('Environment:', process.env.NODE_ENV);
+const isProduction = process.env.NODE_ENV === 'production' || (process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('localhost'));
+console.log('Detected environment for SSL:', isProduction ? 'Production' : 'Local');
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  ssl: isProduction ? { rejectUnauthorized: false } : false,
 });
 
 // Initialize DB Tables
@@ -34,10 +38,11 @@ const initDB = async () => {
     const userRes = await pool.query('SELECT * FROM users WHERE email = $1', ['admin@taskflow.com']);
     if (userRes.rowCount === 0) {
       await pool.query('INSERT INTO users (email, password) VALUES ($1, $2)', ['admin@taskflow.com', 'password123']);
-      console.log('Demo user created: admin@taskflow.com / password123');
     }
-  } catch (err) {
+    console.log('Database connected successfully');
+  } catch (err: any) {
     console.error('DB Init Error:', err);
+    console.error('Connection string present:', !!process.env.DATABASE_URL);
   }
 };
 initDB();
@@ -68,8 +73,8 @@ app.post('/api/waitlist', async (req, res) => {
     res.status(201).json({ message: "You're on the waitlist!" });
   } catch (err: any) {
     if (err.code === '23505') return res.status(400).json({ error: 'Email already exists' });
-    console.error('Database error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Waitlist database error:', err);
+    res.status(500).json({ error: 'Internal server error', details: err.message, code: err.code });
   }
 });
 
@@ -108,9 +113,9 @@ app.patch('/api/tasks/:id', async (req, res) => {
       [title, description, status, id]
     );
     res.json(result.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to update task' });
+  } catch (err: any) {
+    console.error('Task update error:', err);
+    res.status(500).json({ error: 'Failed to update task', details: err.message });
   }
 });
 
@@ -119,9 +124,9 @@ app.delete('/api/tasks/:id', async (req, res) => {
   try {
     await pool.query('DELETE FROM tasks WHERE id = $1', [id]);
     res.json({ message: 'Task deleted' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to delete task' });
+  } catch (err: any) {
+    console.error('Task deletion error:', err);
+    res.status(500).json({ error: 'Failed to delete task', details: err.message });
   }
 });
 
