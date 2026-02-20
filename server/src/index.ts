@@ -24,7 +24,7 @@ console.log('Detected environment for SSL:', isProduction ? 'Production' : 'Loca
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: isProduction ? { rejectUnauthorized: false } : false,
+  ssl: isProduction ? { rejectUnauthorized: false } : undefined,
 });
 
 // Initialize DB Tables
@@ -48,19 +48,48 @@ const initDB = async () => {
 initDB();
 
 // Routes
+// Debug DB Connection Route
+app.get('/api/debug-db', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.json({
+      status: 'Database connected',
+      time: result.rows[0].now,
+      isProduction,
+      hasDatabaseUrl: !!process.env.DATABASE_URL
+    });
+  } catch (err: any) {
+    console.error('Debug DB Error:', err);
+    res.status(500).json({
+      error: 'Database connection failed',
+      details: err.message,
+      code: err.code,
+      isProduction
+    });
+  }
+});
+
 // Auth Route
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
+  console.log('Login attempt for:', email);
   try {
     const result = await pool.query('SELECT * FROM users WHERE email = $1 AND password = $2', [email, password]);
     if (result.rowCount && result.rowCount > 0) {
+      console.log('Login successful for:', email);
       res.json({ message: 'Login successful', user: { email: result.rows[0].email } });
     } else {
+      console.log('Login failed: Invalid credentials for:', email);
       res.status(401).json({ error: 'Invalid credentials' });
     }
   } catch (err: any) {
-    console.error('Login error:', err);
-    res.status(500).json({ error: 'Auth failed', details: err.message });
+    console.error('FATAL Login error:', err);
+    res.status(500).json({
+      error: 'Auth failed',
+      details: err.message,
+      code: err.code,
+      hint: 'Check database connectivity and table schema'
+    });
   }
 });
 // Waitlist Route
