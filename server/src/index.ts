@@ -19,13 +19,24 @@ app.use(cors());
 let dbUrl = process.env.DATABASE_URL;
 console.log('Environment:', process.env.NODE_ENV);
 
+let poolConfig: any = {};
 if (dbUrl) {
-  // Extremely robust sanitization
-  dbUrl = dbUrl.trim();
-  dbUrl = dbUrl.replace(/railwaypostgresql:\/\//gi, 'postgresql://');
-  dbUrl = dbUrl.replace(/railwaypostgres:\/\//gi, 'postgresql://');
-  // Handle cases where the whole string might be wrapped in quotes
-  dbUrl = dbUrl.replace(/^["']|["']$/g, '');
+  dbUrl = dbUrl.trim().replace(/^["']|["']$/g, '');
+  const sanitizedUrl = dbUrl.replace(/^(railwaypostgresql|railwaypostgres):\/\//i, 'postgresql://');
+
+  try {
+    const parsedUrl = new URL(sanitizedUrl);
+    poolConfig = {
+      user: parsedUrl.username,
+      password: parsedUrl.password,
+      host: parsedUrl.hostname,
+      port: parseInt(parsedUrl.port || '5432'),
+      database: parsedUrl.pathname.slice(1) || 'railway',
+    };
+  } catch (e) {
+    console.error('Failed to parse DATABASE_URL manually:', e);
+    poolConfig = { connectionString: dbUrl };
+  }
 } else {
   console.warn('WARNING: DATABASE_URL is not set. Database operations will fail.');
 }
@@ -33,10 +44,8 @@ if (dbUrl) {
 const isProduction = process.env.NODE_ENV === 'production' || (dbUrl && !dbUrl.includes('localhost'));
 console.log('Detected environment for SSL:', isProduction ? 'Production' : 'Local');
 
-const pool = new Pool({
-  connectionString: dbUrl,
-  ssl: isProduction && dbUrl ? { rejectUnauthorized: false } : undefined,
-});
+poolConfig.ssl = isProduction && dbUrl ? { rejectUnauthorized: false } : undefined;
+const pool = new Pool(poolConfig);
 
 // Initialize DB Tables
 const initDB = async () => {
@@ -69,7 +78,15 @@ app.get('/api/debug-db', async (req, res) => {
       isProduction,
       hasDatabaseUrl: !!process.env.DATABASE_URL,
       dbUrlOriginal: process.env.DATABASE_URL ? `${process.env.DATABASE_URL.substring(0, 30)}...` : 'None',
-      dbUrlSanitized: dbUrl ? `${dbUrl.substring(0, 30)}...` : 'None'
+      dbUrlSanitized: dbUrl ? `${dbUrl.substring(0, 30)}...` : 'None',
+      parsedConfig: {
+        host: poolConfig.host,
+        port: poolConfig.port,
+        database: poolConfig.database,
+        user: poolConfig.user,
+        hasPassword: !!poolConfig.password,
+        ssl: !!poolConfig.ssl
+      }
     });
   } catch (err: any) {
     console.error('Debug DB Error:', err);
@@ -80,7 +97,15 @@ app.get('/api/debug-db', async (req, res) => {
       isProduction,
       hasDatabaseUrl: !!process.env.DATABASE_URL,
       dbUrlOriginal: process.env.DATABASE_URL ? `${process.env.DATABASE_URL.substring(0, 30)}...` : 'None',
-      dbUrlSanitized: dbUrl ? `${dbUrl.substring(0, 30)}...` : 'None'
+      dbUrlSanitized: dbUrl ? `${dbUrl.substring(0, 30)}...` : 'None',
+      parsedConfig: {
+        host: poolConfig.host,
+        port: poolConfig.port,
+        database: poolConfig.database,
+        user: poolConfig.user,
+        hasPassword: !!poolConfig.password,
+        ssl: !!poolConfig.ssl
+      }
     });
   }
 });
