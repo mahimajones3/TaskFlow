@@ -5,7 +5,7 @@ import Hero from './components/Hero';
 import Features from './components/Features';
 import HowItWorks from './components/HowItWorks';
 import Testimonials from './components/Testimonials';
-import WaitlistForm from './components/WaitlistForm';
+import FinalCTA from './components/FinalCTA';
 import Footer from './components/Footer';
 import TaskDashboard from './components/TaskDashboard';
 import LoginPage from './components/LoginPage';
@@ -50,7 +50,7 @@ const LandingPage = () => (
     <Features />
     <HowItWorks />
     <Testimonials />
-    <WaitlistForm />
+    <FinalCTA />
   </>
 );
 

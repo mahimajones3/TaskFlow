@@ -20,9 +20,11 @@ const TaskDashboard: React.FC = () => {
     const [userEmail, setUserEmail] = useState<string>('');
     const navigate = useNavigate();
 
-    const fetchTasks = async () => {
+    const fetchTasks = async (email?: string) => {
+        const targetEmail = email || userEmail;
+        if (!targetEmail) return;
         try {
-            const res = await fetch('/api/tasks');
+            const res = await fetch(`/api/tasks?user_email=${encodeURIComponent(targetEmail)}`);
             const data = await res.json();
             setTasks(data);
         } catch (err) {
@@ -33,10 +35,13 @@ const TaskDashboard: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchTasks();
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-            setUserEmail(JSON.parse(storedUser).email);
+            const email = JSON.parse(storedUser).email;
+            setUserEmail(email);
+            fetchTasks(email);
+        } else {
+            setLoading(false);
         }
     }, []);
 
@@ -56,7 +61,8 @@ const TaskDashboard: React.FC = () => {
                     title: newTitle,
                     description: newDesc,
                     deadline: newDeadline,
-                    status: 'todo'
+                    status: 'todo',
+                    user_email: userEmail
                 }),
             });
             if (res.ok) {
@@ -75,7 +81,7 @@ const TaskDashboard: React.FC = () => {
             await fetch(`/api/tasks/${id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status }),
+                body: JSON.stringify({ status, user_email: userEmail }),
             });
             fetchTasks();
         } catch (err) {
@@ -85,7 +91,7 @@ const TaskDashboard: React.FC = () => {
 
     const deleteTask = async (id: number) => {
         try {
-            await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+            await fetch(`/api/tasks/${id}?user_email=${encodeURIComponent(userEmail)}`, { method: 'DELETE' });
             fetchTasks();
         } catch (err) {
             console.error('Delete error:', err);

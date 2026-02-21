@@ -55,10 +55,12 @@ const initDB = async () => {
   try {
     await pool.query('CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, email VARCHAR(255) UNIQUE NOT NULL, password VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT NOW())');
     await pool.query('CREATE TABLE IF NOT EXISTS waitlist (id SERIAL PRIMARY KEY, email VARCHAR(255) UNIQUE NOT NULL, created_at TIMESTAMP DEFAULT NOW())');
-    await pool.query('CREATE TABLE IF NOT EXISTS tasks (id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT, status VARCHAR(50) DEFAULT \'todo\', deadline VARCHAR(50), created_at TIMESTAMP DEFAULT NOW())');
-
-    // Ensure deadline column exists (for migrations)
+    // Ensure deadline and user_email columns exist (for migrations)
     await pool.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS deadline VARCHAR(50)');
+    await pool.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS user_email VARCHAR(255)');
+
+    // Backfill existing tasks with a default user if needed
+    await pool.query("UPDATE tasks SET user_email = 'admin@taskflow.com' WHERE user_email IS NULL");
 
     // Seed a demo user if doesn't exist
     const userRes = await pool.query('SELECT * FROM users WHERE email = $1', ['admin@taskflow.com']);
@@ -186,9 +188,14 @@ app.post('/api/waitlist', async (req, res) => {
 
 // Task CRUD Routes
 app.get('/api/tasks', async (req, res) => {
+  const { user_email } = req.query;
+  if (!user_email) return res.status(400).json({ error: 'user_email is required' });
+
   try {
-    await pool.query('CREATE TABLE IF NOT EXISTS tasks (id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT, status VARCHAR(50) DEFAULT \'todo\', deadline VARCHAR(50), created_at TIMESTAMP DEFAULT NOW())');
-    const result = await pool.query('SELECT * FROM tasks ORDER BY created_at DESC');
+    const result = await pool.query(
+      'SELECT * FROM tasks WHERE user_email = $1 ORDER BY created_at DESC',
+      [user_email]
+    );
     res.json(result.rows);
   } catch (err: any) {
     console.error('FETCH TASKS ERROR:', err);
@@ -197,11 +204,13 @@ app.get('/api/tasks', async (req, res) => {
 });
 
 app.post('/api/tasks', async (req, res) => {
-  const { title, description, deadline } = req.body;
+  const { title, description, deadline, user_email } = req.body;
+  if (!user_email) return res.status(400).json({ error: 'user_email is required' });
+
   try {
     const result = await pool.query(
-      'INSERT INTO tasks (title, description, deadline) VALUES ($1, $2, $3) RETURNING *',
-      [title, description, deadline]
+      'INSERT INTO tasks (title, description, deadline, user_email) VALUES ($1, $2, $3, $4) RETURNING *',
+      [title, description, deadline, user_email]
     );
     res.status(201).json(result.rows[0]);
   } catch (err: any) {
@@ -212,12 +221,15 @@ app.post('/api/tasks', async (req, res) => {
 
 app.patch('/api/tasks/:id', async (req, res) => {
   const { id } = req.params;
-  const { title, description, status, deadline } = req.body;
+  const { title, description, status, deadline, user_email } = req.body;
+  if (!user_email) return res.status(400).json({ error: 'user_email is required' });
+
   try {
     const result = await pool.query(
-      'UPDATE tasks SET title = COALESCE($1, title), description = COALESCE($2, description), status = COALESCE($3, status), deadline = COALESCE($4, deadline) WHERE id = $5 RETURNING *',
-      [title, description, status, deadline, id]
+      'UPDATE tasks SET title = COALESCE($1, title), description = COALESCE($2, description), status = COALESCE($3, status), deadline = COALESCE($4, deadline) WHERE id = $5 AND user_email = $6 RETURNING *',
+      [title, description, status, deadline, id, user_email]
     );
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Task not found or unauthorized' });
     res.json(result.rows[0]);
   } catch (err: any) {
     console.error('Task update error:', err);
@@ -227,8 +239,12 @@ app.patch('/api/tasks/:id', async (req, res) => {
 
 app.delete('/api/tasks/:id', async (req, res) => {
   const { id } = req.params;
+  const { user_email } = req.query;
+  if (!user_email) return res.status(400).json({ error: 'user_email query param is required' });
+
   try {
-    await pool.query('DELETE FROM tasks WHERE id = $1', [id]);
+    const result = await pool.query('DELETE FROM tasks WHERE id = $1 AND user_email = $2', [id, user_email]);
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Task not found or unauthorized' });
     res.json({ message: 'Task deleted' });
   } catch (err: any) {
     console.error('Task deletion error:', err);
