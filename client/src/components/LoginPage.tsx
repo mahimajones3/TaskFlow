@@ -153,20 +153,6 @@ const LoginPage: React.FC = () => {
                         )}
                     </form>
 
-                    <div className="mt-8 pt-8 border-t border-white/5">
-                        <button
-                            onClick={() => {
-                                setStatus('loading');
-                                setTimeout(() => {
-                                    alert('Access request submitted! Our system will review your application.');
-                                    setStatus('idle');
-                                }, 1000);
-                            }}
-                            className="w-full py-4 text-slate-400 hover:text-white transition-all text-xs font-bold uppercase tracking-[0.2em] border border-white/5 rounded-2xl hover:bg-white/5 active:scale-[0.98]"
-                        >
-                            Claim Priority Access
-                        </button>
-                    </div>
                 </div>
 
                 <div className="mt-8 text-center">
