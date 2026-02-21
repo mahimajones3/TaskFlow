@@ -1,7 +1,7 @@
 {
-  "name": "taskflow-fullstack",
+  "name": "sprintdash-fullstack",
   "version": "1.0.0",
-  "description": "Full-stack TaskFlow application",
+  "description": "Full-stack SprintDash application",
   "scripts": {
     "postinstall": "cd client && npm install && cd ../server && npm install",
     "build": "npm run build:client && npm run build:server",

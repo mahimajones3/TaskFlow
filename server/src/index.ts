@@ -60,12 +60,12 @@ const initDB = async () => {
     await pool.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS user_email VARCHAR(255)');
 
     // Backfill existing tasks with a default user if needed
-    await pool.query("UPDATE tasks SET user_email = 'admin@taskflow.com' WHERE user_email IS NULL");
+    await pool.query("UPDATE tasks SET user_email = 'admin@sprintdash.com' WHERE user_email IS NULL");
 
     // Seed a demo user if doesn't exist
-    const userRes = await pool.query('SELECT * FROM users WHERE email = $1', ['admin@taskflow.com']);
+    const userRes = await pool.query('SELECT * FROM users WHERE email = $1', ['admin@sprintdash.com']);
     if (userRes.rowCount === 0) {
-      await pool.query('INSERT INTO users (email, password) VALUES ($1, $2)', ['admin@taskflow.com', 'password123']);
+      await pool.query('INSERT INTO users (email, password) VALUES ($1, $2)', ['admin@sprintdash.com', 'password123']);
     }
     console.log('Database connected successfully');
   } catch (err: any) {

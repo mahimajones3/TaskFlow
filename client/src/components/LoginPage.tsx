@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import Logo from './Logo';
 
 const LoginPage: React.FC = () => {
     const [mode, setMode] = useState<'login' | 'signup'>('login');
@@ -50,13 +51,11 @@ const LoginPage: React.FC = () => {
 
             <div className="w-full max-w-md relative z-10">
                 <div className="text-center mb-10">
-                    <Link to="/" className="inline-flex items-center gap-2 group mb-8">
-                        <div className="w-10 h-10 bg-neon-teal rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(50,249,177,0.4)]">
-                            <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                            </svg>
+                    <Link to="/" className="inline-flex items-center gap-3 group mb-8">
+                        <div className="w-14 h-14 bg-black rounded-2xl flex items-center justify-center border border-white/10 shadow-[0_0_30px_rgba(50,249,177,0.1)] group-hover:border-neon-teal/50 transition-all">
+                            <Logo variant="bolt" size={40} className="text-neon-teal" />
                         </div>
-                        <span className="text-2xl font-bold font-display tracking-tight text-white">TaskFlow</span>
+                        <span className="text-2xl font-bold font-display tracking-tight text-white">SprintDash</span>
                     </Link>
                     <h1 className="text-3xl font-black font-display text-white mb-2 tracking-tight uppercase">
                         {mode === 'login' ? 'Access Terminal' : 'System Enrollment'}

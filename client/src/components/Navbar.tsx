@@ -1,17 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Logo from './Logo';
 
 const Navbar: React.FC = () => {
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 glass h-20 flex items-center border-b border-white/5">
             <div className="container mx-auto px-6 flex justify-between items-center">
-                <Link to="/" className="flex items-center gap-2 group cursor-pointer">
-                    <div className="w-8 h-8 bg-neon-teal rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(50,249,177,0.4)] group-hover:scale-110 transition-transform">
-                        <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
+                <Link to="/" className="flex items-center gap-4 group cursor-pointer">
+                    <div className="w-11 h-11 bg-black rounded-xl flex items-center justify-center border border-white/10 shadow-[0_0_20px_rgba(50,249,177,0.1)] group-hover:border-neon-teal/50 transition-all">
+                        <Logo variant="bolt" size={28} className="text-neon-teal" />
                     </div>
-                    <span className="text-xl font-bold font-display tracking-tight text-white">TaskFlow</span>
+                    <span className="text-xl font-bold font-display tracking-tight text-white">SprintDash</span>
                 </Link>
 
                 <div className="hidden md:flex items-center gap-8 text-sm font-medium">

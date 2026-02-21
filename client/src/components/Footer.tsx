@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Logo from './Logo';
 
 const Footer: React.FC = () => {
     return (
@@ -7,13 +8,11 @@ const Footer: React.FC = () => {
             <div className="container mx-auto px-6">
                 <div className="grid md:grid-cols-4 gap-16 mb-20">
                     <div className="md:col-span-1">
-                        <div className="flex items-center gap-2 mb-8 group cursor-pointer">
-                            <div className="w-8 h-8 bg-neon-teal rounded-lg flex items-center justify-center">
-                                <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                </svg>
+                        <div className="flex items-center gap-3 mb-8 group cursor-pointer">
+                            <div className="w-11 h-11 bg-black rounded-xl flex items-center justify-center border border-white/10 group-hover:border-neon-teal/30 transition-colors">
+                                <Logo variant="bolt" size={28} className="text-neon-teal" />
                             </div>
-                            <span className="text-xl font-bold font-display tracking-tight text-white transition-colors group-hover:text-neon-teal">TaskFlow</span>
+                            <span className="text-xl font-bold font-display tracking-tight text-white transition-colors group-hover:text-neon-teal">SprintDash</span>
                         </div>
                         <p className="text-slate-500 leading-relaxed max-w-xs">
                             The high-performance workspace for the modern developer.
@@ -64,7 +63,7 @@ const Footer: React.FC = () => {
 
                 <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
                     <p className="text-slate-600 text-xs font-mono uppercase tracking-tighter">
-                        [© {new Date().getFullYear()} TASKFLOW_SYS_INC. ALL_RIGHTS_RESERVED]
+                        [© {new Date().getFullYear()} SPRINTDASH_SYS_INC. ALL_RIGHTS_RESERVED]
                     </p>
                     <div className="flex gap-8">
                         <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-slate-600 hover:text-white transition-colors text-xs font-mono uppercase tracking-widest">GITHUB</a>

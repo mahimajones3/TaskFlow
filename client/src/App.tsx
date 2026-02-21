@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import TaskDashboard from './components/TaskDashboard';
 import LoginPage from './components/LoginPage';
 import DocumentationPage from './components/DocumentationPage';
+import LogoShowcase from './components/LogoShowcase';
 
 // Helper to ensure page starts at top on transition
 const ScrollToTop = () => {
@@ -73,6 +74,13 @@ function App() {
         <Route path="/docs" element={
           <PublicLayout>
             <DocumentationPage />
+          </PublicLayout>
+        } />
+
+        {/* Brand Assets Route */}
+        <Route path="/brand" element={
+          <PublicLayout>
+            <LogoShowcase />
           </PublicLayout>
         } />
 

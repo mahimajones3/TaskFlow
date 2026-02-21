@@ -10,13 +10,13 @@ const Hero: React.FC = () => {
 
             <div className="container mx-auto px-6 relative z-10">
                 <div className="max-w-4xl mx-auto text-center mb-16">
-                    <h1 className="text-6xl md:text-8xl font-black font-display tracking-tighter text-white mb-8 leading-[0.9]">
-                        Build fast. <br />
-                        Manage <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-teal to-cyan-400 glow-text">smarter</span>.
+                    <h1 className="text-6xl md:text-8xl font-black font-display tracking-tighter text-white mb-8 leading-[1]">
+                        SprintDash. <br />
+                        Delivering <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-teal to-cyan-400 glow-text">value</span>.
                     </h1>
                     <p className="text-xl text-slate-400 mb-12 leading-relaxed max-w-2xl mx-auto">
-                        The ultimate project workspace designed for high-performance teams.
-                        Automate your workflow, track impact, and ship with 10x confidence.
+                        Power Your Sprints, Deliver the Value.
+                        The ultimate project management workspace designed for high-performance teams.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                         <Link to="/login" className="neon-btn w-full sm:w-auto text-lg flex items-center justify-center">

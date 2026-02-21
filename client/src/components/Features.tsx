@@ -40,7 +40,7 @@ const Features: React.FC = () => {
                         Designed for teams <br /> that ship every day.
                     </h3>
                     <p className="text-slate-400 text-lg">
-                        TaskFlow isn't just a tool; it's a productivity multiplier.
+                        SprintDash isn't just a tool; it's a productivity multiplier.
                         We've removed the noise so you can focus on code.
                     </p>
                 </div>

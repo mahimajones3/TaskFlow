@@ -9,7 +9,7 @@ const steps = [
     {
         number: '02',
         title: 'Map the Workflow',
-        description: 'Define your stages, set up automated triggers, and link your repos. TaskFlow handles the rest.'
+        description: 'Define your stages, set up automated triggers, and link your repos. SprintDash handles the rest.'
     },
     {
         number: '03',
@@ -28,11 +28,11 @@ const HowItWorks: React.FC = () => {
                     <div className="max-w-xl">
                         <h2 className="text-4xl md:text-5xl font-black font-display text-white mb-6">Built for scale.</h2>
                         <p className="text-slate-400 text-lg leading-relaxed">
-                            Forget the manual overhead. TaskFlow provides a developer-first interface
+                            Forget the manual overhead. SprintDash provides a developer-first interface
                             to manage your most ambitious projects without the friction.
                         </p>
                     </div>
-                    
+
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-12">

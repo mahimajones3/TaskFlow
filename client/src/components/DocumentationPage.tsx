@@ -6,7 +6,7 @@ const DocumentationPage: React.FC = () => {
         {
             title: "Getting Started",
             items: [
-                { id: 'introduction', label: "Introduction", content: "TaskFlow is a high-performance workspace designed for modern engineering teams. It streamlines project management with a developer-first approach, featuring real-time state sync and automated task prioritization." },
+                { id: 'introduction', label: "Introduction", content: "SprintDash is a high-performance workspace designed for modern engineering teams. It streamlines project management with a developer-first approach, featuring real-time state sync and automated task prioritization." },
                 { id: 'quickstart', label: "Quickstart", content: "To begin, initialize your workspace using the 'Start Building Now' button on the landing page. Follow the system enrollment process to create your operator credentials." }
             ]
         },
@@ -20,7 +20,7 @@ const DocumentationPage: React.FC = () => {
         {
             title: "API & Tools",
             items: [
-                { id: 'api', label: "REST API", content: "Integrate TaskFlow into your existing CI/CD pipelines. Our comprehensive API allows for full control over projects, tasks, and team data." },
+                { id: 'api', label: "REST API", content: "Integrate SprintDash into your existing CI/CD pipelines. Our comprehensive API allows for full control over projects, tasks, and team data." },
                 { id: 'cli', label: "CLI Terminal", content: "For power users, our CLI tool provides a command-line interface to manage your workspace without leaving your terminal." }
             ]
         }
@@ -64,7 +64,7 @@ const DocumentationPage: React.FC = () => {
                                 System <span className="text-neon-teal">Docs</span>
                             </h1>
                             <p className="text-xl text-slate-400 leading-relaxed max-w-2xl">
-                                Documentation for TaskFlow OS. Learn how to optimize your team's performance
+                                Documentation for SprintDash OS. Learn how to optimize your team's performance
                                 and leverage our core scheduling engine.
                             </p>
                         </header>

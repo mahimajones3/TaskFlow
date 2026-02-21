@@ -21,7 +21,7 @@ const FinalCTA: React.FC = () => {
                 </h2>
 
                 <p className="text-slate-400 mb-14 text-xl max-w-2xl mx-auto leading-relaxed">
-                    TaskFlow gives your team the clarity and speed it needs to ship faster. Sign in and start building today.
+                    SprintDash gives your team the clarity and speed it needs to ship faster. Sign in and start building today.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

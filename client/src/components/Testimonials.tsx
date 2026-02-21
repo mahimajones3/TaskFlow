@@ -4,7 +4,7 @@ const testimonials = [
     {
         name: 'Alex Rivera',
         role: 'Staff Engineer at Voxel',
-        content: 'TaskFlow is the first project management tool that doesn\'t slow me down. The CLI and API-first approach are game changers.',
+        content: 'SprintDash is the first project management tool that doesn\'t slow me down. The CLI and API-first approach are game changers.',
         avatar: 'https://i.pravatar.cc/150?u=alex'
     },
     {
