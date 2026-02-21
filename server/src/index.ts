@@ -20,25 +20,29 @@ app.use(express.json());
 const dbUrl = process.env.DATABASE_URL;
 console.log('Environment:', process.env.NODE_ENV);
 
-// Support both DATABASE_URL and individual variables
-const poolConfig: any = {
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME,
-};
+// Configuration logic: Prioritize individual variables ONLY if DATABASE_URL isn't targeting localhost
+// This prevents production settings in .env from breaking local development
+const poolConfig: any = {};
 
-// If no individual config, fallback to DATABASE_URL with sanitization
-if (!poolConfig.host && dbUrl) {
+if (dbUrl && (dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1'))) {
+  let sanitizedUrl = dbUrl.trim().replace(/^["']|["']$/g, '');
+  sanitizedUrl = sanitizedUrl.replace(/^(railwaypostgresql|railwaypostgres):\/\//i, 'postgresql://');
+  poolConfig.connectionString = sanitizedUrl;
+} else if (process.env.DB_HOST) {
+  poolConfig.user = process.env.DB_USER;
+  poolConfig.password = process.env.DB_PASSWORD;
+  poolConfig.host = process.env.DB_HOST;
+  poolConfig.port = parseInt(process.env.DB_PORT || '5432');
+  poolConfig.database = process.env.DB_NAME;
+} else if (dbUrl) {
   let sanitizedUrl = dbUrl.trim().replace(/^["']|["']$/g, '');
   sanitizedUrl = sanitizedUrl.replace(/^(railwaypostgresql|railwaypostgres):\/\//i, 'postgresql://');
   poolConfig.connectionString = sanitizedUrl;
 }
 
 const isProduction = process.env.NODE_ENV === 'production' ||
-  (dbUrl && !dbUrl.includes('localhost')) ||
-  (poolConfig.host && !poolConfig.host.includes('localhost'));
+  (dbUrl && !dbUrl.includes('localhost') && !dbUrl.includes('127.0.0.1')) ||
+  (poolConfig.host && !poolConfig.host.includes('localhost') && !poolConfig.host.includes('127.0.0.1'));
 
 console.log('Detected environment for SSL:', isProduction ? 'Production' : 'Local');
 
@@ -51,7 +55,10 @@ const initDB = async () => {
   try {
     await pool.query('CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, email VARCHAR(255) UNIQUE NOT NULL, password VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT NOW())');
     await pool.query('CREATE TABLE IF NOT EXISTS waitlist (id SERIAL PRIMARY KEY, email VARCHAR(255) UNIQUE NOT NULL, created_at TIMESTAMP DEFAULT NOW())');
-    await pool.query('CREATE TABLE IF NOT EXISTS tasks (id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT, status VARCHAR(50) DEFAULT \'todo\', created_at TIMESTAMP DEFAULT NOW())');
+    await pool.query('CREATE TABLE IF NOT EXISTS tasks (id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT, status VARCHAR(50) DEFAULT \'todo\', deadline VARCHAR(50), created_at TIMESTAMP DEFAULT NOW())');
+
+    // Ensure deadline column exists (for migrations)
+    await pool.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS deadline VARCHAR(50)');
 
     // Seed a demo user if doesn't exist
     const userRes = await pool.query('SELECT * FROM users WHERE email = $1', ['admin@taskflow.com']);
@@ -109,7 +116,37 @@ app.get('/api/debug-db', async (req, res) => {
   }
 });
 
-// Auth Route
+// Auth Routes
+app.post('/api/signup', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+
+  try {
+    // Check if user already exists
+    const checkUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (checkUser.rowCount && checkUser.rowCount > 0) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+
+    // Insert new user
+    const result = await pool.query(
+      'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email',
+      [email, password]
+    );
+
+    console.log('User signed up:', email);
+    res.status(201).json({
+      message: 'User created successfully',
+      user: { id: result.rows[0].id, email: result.rows[0].email }
+    });
+  } catch (err: any) {
+    console.error('Signup error:', err);
+    res.status(500).json({ error: 'Failed to create user', details: err.message });
+  }
+});
+
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
   console.log('Login attempt for:', email);
@@ -150,7 +187,7 @@ app.post('/api/waitlist', async (req, res) => {
 // Task CRUD Routes
 app.get('/api/tasks', async (req, res) => {
   try {
-    await pool.query('CREATE TABLE IF NOT EXISTS tasks (id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT, status VARCHAR(50) DEFAULT \'todo\', created_at TIMESTAMP DEFAULT NOW())');
+    await pool.query('CREATE TABLE IF NOT EXISTS tasks (id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT, status VARCHAR(50) DEFAULT \'todo\', deadline VARCHAR(50), created_at TIMESTAMP DEFAULT NOW())');
     const result = await pool.query('SELECT * FROM tasks ORDER BY created_at DESC');
     res.json(result.rows);
   } catch (err: any) {
@@ -160,11 +197,11 @@ app.get('/api/tasks', async (req, res) => {
 });
 
 app.post('/api/tasks', async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, deadline } = req.body;
   try {
     const result = await pool.query(
-      'INSERT INTO tasks (title, description) VALUES ($1, $2) RETURNING *',
-      [title, description]
+      'INSERT INTO tasks (title, description, deadline) VALUES ($1, $2, $3) RETURNING *',
+      [title, description, deadline]
     );
     res.status(201).json(result.rows[0]);
   } catch (err: any) {
@@ -175,11 +212,11 @@ app.post('/api/tasks', async (req, res) => {
 
 app.patch('/api/tasks/:id', async (req, res) => {
   const { id } = req.params;
-  const { title, description, status } = req.body;
+  const { title, description, status, deadline } = req.body;
   try {
     const result = await pool.query(
-      'UPDATE tasks SET title = COALESCE($1, title), description = COALESCE($2, description), status = COALESCE($3, status) WHERE id = $4 RETURNING *',
-      [title, description, status, id]
+      'UPDATE tasks SET title = COALESCE($1, title), description = COALESCE($2, description), status = COALESCE($3, status), deadline = COALESCE($4, deadline) WHERE id = $5 RETURNING *',
+      [title, description, status, deadline, id]
     );
     res.json(result.rows[0]);
   } catch (err: any) {

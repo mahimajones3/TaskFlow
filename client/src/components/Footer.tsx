@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
     return (
@@ -22,20 +23,20 @@ const Footer: React.FC = () => {
                     <div>
                         <h5 className="font-bold text-white mb-8 uppercase text-xs tracking-widest opacity-50">Systems</h5>
                         <ul className="space-y-4 text-slate-500 text-sm">
-                            <li><a href="#" className="hover:text-neon-teal transition-colors">Features</a></li>
-                            <li><a href="#" className="hover:text-neon-teal transition-colors">API Docs</a></li>
-                            <li><a href="#" className="hover:text-neon-teal transition-colors">CLI Tool</a></li>
-                            <li><a href="#" className="hover:text-neon-teal transition-colors">Security</a></li>
+                            <li><Link to="/docs" className="hover:text-neon-teal transition-colors">Features</Link></li>
+                            <li><Link to="/docs" className="hover:text-neon-teal transition-colors">API Docs</Link></li>
+                            <li><Link to="/docs" className="hover:text-neon-teal transition-colors">CLI Tool</Link></li>
+                            <li><Link to="/docs" className="hover:text-neon-teal transition-colors">Security</Link></li>
                         </ul>
                     </div>
 
                     <div>
                         <h5 className="font-bold text-white mb-8 uppercase text-xs tracking-widest opacity-50">Org</h5>
                         <ul className="space-y-4 text-slate-500 text-sm">
-                            <li><a href="#" className="hover:text-neon-teal transition-colors">About</a></li>
-                            <li><a href="#" className="hover:text-neon-teal transition-colors">Terms</a></li>
-                            <li><a href="#" className="hover:text-neon-teal transition-colors">Privacy</a></li>
-                            <li><a href="#" className="hover:text-neon-teal transition-colors">Contact</a></li>
+                            <li><Link to="/docs" className="hover:text-neon-teal transition-colors">About</Link></li>
+                            <li><Link to="/docs" className="hover:text-neon-teal transition-colors">Terms</Link></li>
+                            <li><Link to="/docs" className="hover:text-neon-teal transition-colors">Privacy</Link></li>
+                            <li><Link to="/docs" className="hover:text-neon-teal transition-colors">Contact</Link></li>
                         </ul>
                     </div>
 
@@ -43,10 +44,20 @@ const Footer: React.FC = () => {
                         <h5 className="font-bold text-white mb-8 uppercase text-xs tracking-widest opacity-50">Support</h5>
                         <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
                             <p className="text-xs text-slate-500 mb-4">Subscribe to system alerts</p>
-                            <div className="flex gap-2">
-                                <input type="email" placeholder="Email" className="bg-black border border-white/10 rounded-lg px-3 py-2 text-xs text-white flex-1 focus:outline-none focus:border-neon-teal/50" />
-                                <button className="bg-white/5 p-2 rounded-lg border border-white/10 text-white hover:bg-white/10 transition-colors">➔</button>
-                            </div>
+                            <form
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement).value;
+                                    if (email) {
+                                        alert('Subscription successful! You will receive system alerts at ' + email);
+                                        e.currentTarget.reset();
+                                    }
+                                }}
+                                className="flex gap-2"
+                            >
+                                <input name="email" type="email" placeholder="Email" className="bg-black border border-white/10 rounded-lg px-3 py-2 text-xs text-white flex-1 focus:outline-none focus:border-neon-teal/50" required />
+                                <button type="submit" className="bg-white/5 p-2 rounded-lg border border-white/10 text-white hover:bg-white/10 transition-colors">➔</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -56,8 +67,8 @@ const Footer: React.FC = () => {
                         [© {new Date().getFullYear()} TASKFLOW_SYS_INC. ALL_RIGHTS_RESERVED]
                     </p>
                     <div className="flex gap-8">
-                        <a href="#" className="text-slate-600 hover:text-white transition-colors text-xs font-mono uppercase tracking-widest">GITHUB</a>
-                        <a href="#" className="text-slate-600 hover:text-white transition-colors text-xs font-mono uppercase tracking-widest">TWITTER</a>
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-slate-600 hover:text-white transition-colors text-xs font-mono uppercase tracking-widest">GITHUB</a>
+                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-slate-600 hover:text-white transition-colors text-xs font-mono uppercase tracking-widest">TWITTER</a>
                     </div>
                 </div>
             </div>

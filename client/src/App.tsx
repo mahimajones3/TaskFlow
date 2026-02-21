@@ -9,6 +9,7 @@ import WaitlistForm from './components/WaitlistForm';
 import Footer from './components/Footer';
 import TaskDashboard from './components/TaskDashboard';
 import LoginPage from './components/LoginPage';
+import DocumentationPage from './components/DocumentationPage';
 
 // Helper to ensure page starts at top on transition
 const ScrollToTop = () => {
@@ -67,6 +68,13 @@ function App() {
 
         {/* Auth Route */}
         <Route path="/login" element={<LoginPage />} />
+
+        {/* Documentation Route */}
+        <Route path="/docs" element={
+          <PublicLayout>
+            <DocumentationPage />
+          </PublicLayout>
+        } />
 
         {/* Protected Dashboard */}
         <Route path="/dashboard" element={

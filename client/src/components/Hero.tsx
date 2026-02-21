@@ -1,4 +1,5 @@
 import DashboardPreview from './DashboardPreview';
+import { Link } from 'react-router-dom';
 
 const Hero: React.FC = () => {
     return (
@@ -18,15 +19,15 @@ const Hero: React.FC = () => {
                         Automate your workflow, track impact, and ship with 10x confidence.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                        <button className="neon-btn w-full sm:w-auto text-lg">
+                        <Link to="/login" className="neon-btn w-full sm:w-auto text-lg flex items-center justify-center">
                             Start Building Now
-                        </button>
-                        <button className="w-full sm:w-auto bg-white/5 text-white px-8 py-4 rounded-full font-semibold text-lg border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center gap-2 group">
+                        </Link>
+                        <Link to="/docs" className="w-full sm:w-auto bg-white/5 text-white px-8 py-4 rounded-full font-semibold text-lg border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center gap-2 group">
                             View Documentation
                             <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
-                        </button>
+                        </Link>
                     </div>
                 </div>
 
